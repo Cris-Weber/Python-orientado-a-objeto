@@ -1,0 +1,106 @@
+#Entrada de dados, classes e apresentação dos gráficos
+
+#bibliotecas utilizadas
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import matplotlib.pyplot as plt
+
+#-------------------------------------------------------------------------------
+#definição dos dados
+#-------------------------------------------------------------------------------
+class despesa:  
+    def __init__(self, despesa, mes):
+        self.set_despesa(despesa)
+        self.set_mes(mes)
+
+    def set_despesa(self, despesa):
+      self.despesa=despesa
+
+    def set_mes(self, mes):
+      self.mes=mes
+
+    def get_despesa(self):
+      return self.despesa
+    
+    def get_valor(self):
+      return self.valor
+#-------------------------------------------------------------------------------
+#definição dos graficos
+#-------------------------------------------------------------------------------
+class Grafico:  
+  def __init__(self, lista_despesas):
+    self.lista_despesas=lista_despesas
+    self.imprimir_graficos()
+
+  def padrao_do_grafico(self):
+    plt.xlabel('Dia')
+    plt.ylabel('Valor')
+    plt.title('Gráficos de Despesas')    
+
+  def imprimir_graficos(self):
+    self.padrao_do_grafico()
+    for despesa in self.lista_despesas:
+      mLista = despesa.dicionario.items()
+      cor = despesa.cor
+      nome = despesa.nome
+      x, y = zip(*mLista)
+      plt.plot(x, y, label = nome, marker='o', 
+               markerfacecolor='blue', 
+               markersize=14, 
+               color=cor, 
+               linewidth=6)
+    plt.legend()
+    plt.show()
+
+  def regressao_linear(self, id_grafico):
+    despesa = self.lista_despesas[id_grafico]
+    mLista = despesa.dicionario.items()    
+    cor = despesa.cor
+    nome = despesa.nome
+    dias, valores = zip(*mLista)
+    dias = np.array(dias)
+    valores = np.array(valores)
+    dias = dias.reshape(-1, 1)
+    valores = valores.reshape(-1, 1)
+    regr = LinearRegression()
+    regr.fit(X=dias, y=valores)
+    plt.plot(dias, regr.predict(dias), 
+             color='blue',
+             label = "Regressão Linear")
+
+    x, y = zip(*mLista)
+    plt.plot(x, y, label = nome+str(" - original"), 
+             marker='o', 
+             markerfacecolor='olive', 
+             markersize=14, 
+             color=cor, 
+             linewidth=6)
+
+    plt.legend()
+    plt.show()
+
+#-------------------------------------------------------------------------------
+#Dados das despesas
+#-------------------------------------------------------------------------------
+class despesa:
+    def __init__(self, dicionario, cor, nome):
+        self.dicionario = dicionario
+        self.cor=cor
+        self.nome = nome
+
+maio = despesa({2:50,6:35,15:25,20:81,22:25,25:35,30:43},'yellow','maio')
+junho = despesa({3:30,6:55,16:29,21:95,25:51,29:63,30:37},'red','junho')
+julho = despesa({2:68,4:33,13:21,23:72,24:12,26:54,28:25},'green','julho')
+lista_despesas = [maio,junho,julho]
+
+#-------------------------------------------------------------------------------
+#impressão dos graficos
+#-------------------------------------------------------------------------------
+grafico = Grafico(lista_despesas)
+
+id_mes = 0 #mês de maio
+grafico.regressao_linear(id_mes)
+
+
+
+
